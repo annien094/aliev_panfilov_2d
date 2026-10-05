@@ -99,7 +99,7 @@ class Params:
     # Pacing
     BCL: float = 50.0                       # AU, basic cycle length (time between paced beats)
     ncyc: int = 1                           # number of paced beats
-    stimdur: float = 1.0                    # AU
+    stimdur: float = 2.0                    # AU, duration of each pacing stimulus
     stim_mask: Optional[np.ndarray] = None  # interior (ncells,ncells) boolean/0-1
     stim_amp_scale: float = 0.1             # stimulus current: Ia = stim_amp_scale * stim_mask
 
@@ -343,7 +343,7 @@ def simulate(params: Params,
 
         # Determine stimulation window for current cycle kk (integer)
         kk_f = kk.astype(dtype)  # for t comparisons with BCL*kk
-        stim_on = (kk < ncyc) & (t >= BCL * kk_f) & (t < (BCL * kk_f + stimdur * 2.0))
+        stim_on = (kk < ncyc) & (t >= BCL * kk_f) & (t < (BCL * kk_f + stimdur))
 
         # Cross-field stimulation for spiral wave (applied at specific time)
         cross_stim_on = (t >= cross_stim_time) & (t < (cross_stim_time + cross_stim_duration))
@@ -358,7 +358,7 @@ def simulate(params: Params,
         Istim = Istim_primary + Istim_cross
 
         # Update kk when stimulation window has ended
-        kk_inc = (kk < ncyc) & (t >= (BCL * kk_f + stimdur * 2.0))
+        kk_inc = (kk < ncyc) & (t >= (BCL * kk_f + stimdur))
         kk_next = kk + kk_inc.astype(kk.dtype)
 
         # RK4 step
@@ -699,7 +699,7 @@ def save_VW_video(Vsav, Wsav, overlay_mask=None, filename="aliev_panfilov.mp4",
                 draw.text((w_x, 5), "W", fill=(255, 255, 255), font=font_large)
 
             if add_time:
-                t_tu = k * dt * gathert
+                t_tu = (k + 1) * dt * gathert   # frame k is saved after (k + 1) * gathert steps
                 t_ms = t_tu * MS_PER_TU
                 time_str = f"Time = {t_tu:.2f} TU ({t_ms:.2f} ms)"
                 draw.text((10, frame.shape[0] - 25), time_str, fill=(255, 255, 255), font=font_small)

@@ -271,13 +271,11 @@ def make_D_with_rect_patches(ncells: int, D0: float, Dfac: float, npatches: int,
             D[np.ix_(I, J)] = D0 * Dfac
 
             # Store pixel coordinates [row, col] for this patch
-            rows, cols = np.where(occ & ~(occ ^ occ))  # get just this patch
-            # Better: directly compute from I, J
             patch_rows, patch_cols = np.meshgrid(I, J, indexing='ij')
             fiblocs.append(np.stack([patch_rows.ravel(), patch_cols.ravel()], axis=1).astype(np.int32))
             n += 1
 
-    return D, occ
+    return D, fiblocs
 
 
 # -------------------------------------------------------------------------
@@ -605,7 +603,7 @@ def run_single_simulation(ncells: int,
         tend=50*3,
         BCL=50.0,
         ncyc=ncyc,
-        stimdur=1.0,
+        stimdur=2.0,
         gathert=10,
         ncells=ncells,
         h=0.1,
@@ -652,7 +650,7 @@ def run_single_simulation(ncells: int,
         "fiblocs": fiblocs,
         "stim_centers": stim_centers,
         "phie": phie,
-        "elecpos": elecpos,
+        "elecpos": elecpos * p.h,   # same length unit as h, as in run_planar_simulation
         "Dfac": Dfac,
         "a_factor": a_factor,
         "b_factor": b_factor,
@@ -683,7 +681,7 @@ def run_single_simulation(ncells: int,
             D_matrix=result["D_matrix"],    # (X, X) - [row, col] where X=ncells+2
             fiblocs=fiblocs_save,           # object array of (N_patch, 2) arrays - each [row, col]
             phie=result["phie"],            # (E, T) - [electrode, time]
-            elecpos=result["elecpos"],      # (E, 2) - [electrode, (x, y)]
+            elecpos=result["elecpos"],      # (E, 2) - [electrode, (row, col)], in units of h, frame of the grid with ghost border
             stim_centers=np.array(result["stim_centers"], dtype=np.int32),  # (ncyc,2) - (row, col) per cycle
             patch_type=patch_type,
             mode=mode,
@@ -778,7 +776,7 @@ def run_simulations_same_patches(ncells: int,
             tend=50*3,
             BCL=50.0,
             ncyc=3,
-            stimdur=1.0,
+            stimdur=2.0,
             gathert=10,
             ncells=ncells,
             h=0.1,
@@ -818,7 +816,7 @@ def run_simulations_same_patches(ncells: int,
             "fiblocs": fiblocs,
             "stim_center": stim_center,
             "phie": phie,
-            "elecpos": elecpos,
+            "elecpos": elecpos * p.h,   # same length unit as h, as in run_planar_simulation
             "params": p,
             "patch_type": patch_type,
             "patch_seed": patch_seed,
@@ -1254,9 +1252,11 @@ def generate_no_fibrosis_dataset(n_simulations: int = 5,
         elecposY=np.array(elecposY),
     )
 
+    # Vpos shares the frame of elecpos, that of the grid including its ghost
+    # border: interior cell [i, j] is cell [i+1, j+1] of the full grid.
     rows, cols = np.meshgrid(
-        np.arange(ncells, dtype=np.int32),
-        np.arange(ncells, dtype=np.int32),
+        np.arange(1, ncells + 1, dtype=np.int32),
+        np.arange(1, ncells + 1, dtype=np.int32),
         indexing="ij",
     )
     Vpos = np.stack([rows.ravel(), cols.ravel()], axis=1)
@@ -1291,7 +1291,7 @@ def generate_no_fibrosis_dataset(n_simulations: int = 5,
             tend=50.0,
             BCL=50.0,
             ncyc=1,
-            stimdur=1.0,
+            stimdur=2.0,
             gathert=10,
             ncells=ncells,
             h=0.1,

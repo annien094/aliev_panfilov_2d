@@ -6,6 +6,17 @@ with explicit RK4 time stepping and no-flux boundaries. It can also compute the
 extracellular potential (phie) recorded by a grid of electrodes and save a
 video of the simulation.
 
+Installation
+------------
+    conda env create -f environment.yml
+    conda activate aliev-panfilov
+
+or, in an existing Python environment (3.10 or newer):
+
+    pip install -r requirements.txt
+
+See the notes in requirements.txt for GPU support and Apple-silicon Macs.
+
 Quick start: a planar wave on homogeneous tissue
 ------------------------------------------------
     from solveAP_2D_jax import Params, planar_stim_mask, run_planar_simulation

@@ -1,0 +1,24 @@
+# Python packages needed to run solveAP_2D_jax.py and solveAP_2D_heterogeneity.py.
+# Requires Python 3.10 or newer.
+#
+# Install into the current environment with:
+#     pip install -r requirements.txt
+# (or create a fresh conda environment with environment.yml instead).
+#
+# This installs the CPU version of JAX, which is enough to run everything.
+# On a Linux machine with an NVIDIA GPU, add GPU support afterwards with:
+#     pip install --upgrade "jax[cuda12]"
+#
+# On an Apple-silicon Mac, use a native (arm64) Python such as the one from
+# Miniforge: the JAX package from pip does not run in an Intel Python under
+# Rosetta.
+#
+# Tested on Python 3.10, 3.11 and 3.12, with JAX 0.4.35, 0.6.2, 0.10.2 and 0.11.2.
+
+jax>=0.4.35
+numpy
+matplotlib
+imageio
+imageio-ffmpeg    # lets imageio write .mp4 videos (without it a .gif is written)
+pillow
+scipy             # used only by solveAP_2D_heterogeneity.py

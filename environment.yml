@@ -1,0 +1,16 @@
+# Conda environment for the 2D Aliev-Panfilov solver.
+#
+# Create and activate it with:
+#     conda env create -f environment.yml
+#     conda activate aliev-panfilov
+#
+# The packages themselves are listed in requirements.txt (keep both files in
+# the same folder).
+name: aliev-panfilov
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - -r requirements.txt

@@ -1,0 +1,4 @@
+__pycache__/
+*.npz
+*.mp4
+*.gif

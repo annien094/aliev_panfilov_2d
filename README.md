@@ -37,9 +37,6 @@ out = run_planar_simulation(params, name="planar_wave")
 V = out["Vsav"]   # (frames, ncells, ncells)
 ```
 
-The files are split into `#%%` cells. In the VS Code interactive window, run the
-cells from the top: the imports cell has to run before any other.
-
 ## Pacing somewhere else
 
 `planar_stim_mask` paces a strip along the `"top"`, `"bottom"`, `"left"` or
@@ -100,16 +97,3 @@ with defaults `k = 8`, `a0 = 0.01`, `b0 = 0.15`, `mu1 = 0.2`, `mu2 = 0.3`,
 - `solveAP_2D_heterogeneity.py`: fibrotic and hyper-excitable patches, random
   pacing sites, a spiral-wave stimulus and dataset generators. It imports the
   solver, so keep both files in the same folder.
-
-## Known limitations of solveAP_2D_heterogeneity.py
-
-- A paced beat does not start a wave if its site is still refractory. With the
-  default three beats 50 time units apart, this happened in one of three test
-  runs, so check `phie` or the video before assuming a run has three waves.
-- `make_D_with_rect_patches` retries forever if the patches cannot fit, for
-  example several patches on a small grid.
-- `fiblocs` is saved as an object array: load the file with
-  `np.load(..., allow_pickle=True)`. For a run with one patch, convert it with
-  `.astype(int)` before using it as an index.
-- `stim_centers` are indices on the sheet itself, while `fiblocs` and `D_matrix`
-  include the one-cell border. Add 1 to a stimulus centre to compare them.
